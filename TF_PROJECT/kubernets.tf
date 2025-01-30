@@ -6,7 +6,7 @@ resource "kubernetes_namespace" "client_namespace" {
   }
 }
 
-resource "kubernetes_ingress" "odoo_https" {
+resource "kubernetes_ingress_v1" "odoo_https" {
   for_each = toset(var.clients)
 
   metadata {
@@ -16,7 +16,7 @@ resource "kubernetes_ingress" "odoo_https" {
 
   spec {
     tls {
-      secret_name = "odoo-tls-secret"  
+      secret_name = "odoo-tls-secret"
       hosts       = ["odoo-${each.value}.example.com"]
     }
 
@@ -24,10 +24,16 @@ resource "kubernetes_ingress" "odoo_https" {
       host = "odoo-${each.value}.example.com"
       http {
         path {
-          path = "/"
+          path      = "/"
+          path_type = "Prefix"
+
           backend {
-            service_name = "odoo-service"  
-            service_port = 8069           
+            service {
+              name = "odoo-service"
+              port {
+                number = 8069
+              }
+            }
           }
         }
       }
