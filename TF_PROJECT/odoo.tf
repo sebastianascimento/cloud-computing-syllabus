@@ -62,6 +62,8 @@ resource "kubernetes_deployment" "odoo" {
       }
     }
   }
+
+  depends_on = [kubernetes_namespace.client_namespace]
 }
 
 resource "kubernetes_service" "odoo_service" {
@@ -87,4 +89,61 @@ resource "kubernetes_service" "odoo_service" {
 
     type = "NodePort"
   }
+
+  depends_on = [kubernetes_deployment.odoo]
+}
+
+resource "kubernetes_secret" "odoo_tls_secret" {
+  for_each = toset(var.clients)
+
+  metadata {
+    name      = "odoo-tls-secret"
+    namespace = kubernetes_namespace.client_namespace[each.key].metadata[0].name
+  }
+
+  data = {
+    "tls.crt" = filebase64("${path.module}/tls/cert.crt")  # Caminho para o seu certificado
+    "tls.key" = filebase64("${path.module}/tls/cert.key")  # Caminho para sua chave privada
+  }
+
+  type = "kubernetes.io/tls"
+  
+  depends_on = [kubernetes_service.odoo_service]
+}
+
+resource "kubernetes_ingress_v1" "odoo_https" {
+  for_each = toset(var.clients)
+
+  metadata {
+    name      = "odoo-ingress-${each.value}"
+    namespace = kubernetes_namespace.client_namespace[each.key].metadata[0].name
+  }
+
+  spec {
+    tls {
+      secret_name = kubernetes_secret.odoo_tls_secret[each.key].metadata[0].name
+      hosts       = ["odoo-${each.value}.example.com"]
+    }
+
+    rule {
+      host = "odoo-${each.value}.example.com"
+      http {
+        path {
+          path      = "/"
+          path_type = "Prefix"
+
+          backend {
+            service {
+              name = kubernetes_service.odoo_service[each.key].metadata[0].name
+              port {
+                number = 8069
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  depends_on = [kubernetes_service.odoo_service]
 }
