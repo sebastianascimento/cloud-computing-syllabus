@@ -1,110 +1,93 @@
-Projeto Terraform para Kubernetes com Odoo e PostgreSQL
-Descrição
-Este projeto utiliza o Terraform para provisionar recursos no Kubernetes, incluindo o Odoo e o PostgreSQL. Ele foi desenvolvido com o objetivo de fornecer uma solução automatizada para implantar e gerenciar esses recursos em um cluster Kubernetes. O Terraform facilita a criação, alteração e versionamento da infraestrutura de forma repetível e controlada.
+# Terraform Project for Kubernetes with Odoo and PostgreSQL
 
-Tecnologias Utilizadas
-Terraform: Ferramenta de infraestrutura como código para provisionar e gerenciar recursos em nuvem.
-Kubernetes: Sistema de orquestração de contêineres para automação da implantação, escalabilidade e gerenciamento de aplicações em contêiner.
-Minikube: Ferramenta para criar um cluster Kubernetes localmente, ideal para ambientes de desenvolvimento.
-Odoo: Aplicação de código aberto para gestão empresarial, utilizada como a aplicação principal neste projeto.
-PostgreSQL: Banco de dados relacional usado para armazenar os dados do Odoo.
+## Technologies Used
 
-Estretura do projeto:
-├── main.tf              # Arquivo principal de configuração do Terraform
-├── variables.tf         # Definição de variáveis do projeto
-├── outputs.tf           # Definição de saídas do Terraform
-├── terraform.tfvars     # Arquivo de variáveis específicas de configuração
-├── kubernetes.tf        # Configuração específica do Kubernetes
-├── odoo.tf              # Configuração e implantação do Odoo
-├── provider.tf          # Definição dos provedores utilizados (Kubernetes, etc.)
-├── postgres.tf          # Configuração do banco de dados PostgreSQL
-└── README.md            # Este arquivo de documentação do projeto
+- **Terraform** 
+- **Kubernetes** 
+- **Minikube**
+- **Odoo**
 
-Requisitos
-Para rodar este projeto localmente, você precisará de:
+## Project Structure
 
-Terraform versão 1.0.0 ou superior
-Minikube (ou um cluster Kubernetes funcional)
-kubectl configurado para se comunicar com seu cluster Kubernetes
+├── main.tf              
+├── variables.tf         
+├── outputs.tf           
+├── terraform.tfvars     
+├── kubernetes.tf        
+├── odoo.tf              
+├── provider.tf          
+├── postgres.tf         
+└── README.md           
 
 
-Como Rodar o Projeto Localmente
-Passo 1: Instalar as Dependências
-Antes de começar, certifique-se de ter o Terraform, Minikube, kubectl instalados no seu sistema.
+## How to Run the Project Locally
 
-Instalar o Terraform:
+### Step 1: Install Dependencies
 
-Para sistemas baseados em Linux:
-bash
-sudo apt-get install terraform
-Para outros sistemas operacionais, siga as instruções oficiais.
+Before starting, ensure that Terraform, Minikube  and kubectl are installed on your system.
 
-Instalar o Minikube:
+### Step 2: Start Minikube
 
-Para sistemas baseados em Linux:
-bash
+```bash
+minikube start 
+```
 
-sudo apt-get install minikube
-Para outros sistemas operacionais, siga as instruções oficiais.
+### Step 3: Configure Terraform
 
-Instalar o kubectl:
-Para sistemas baseados em Linux:
+Initialize Terraform:
 
-sudo apt-get install kubectl
-Para outros sistemas operacionais, siga as instruções oficiais.
-
-Instalar o Helm:
-Para sistemas baseados em Linux:
-
-sudo apt-get install helm
-Para outros sistemas operacionais, siga as instruções oficiais.
-Passo 2: Iniciar o Minikube
-
-Inicie o Minikube para criar um cluster Kubernetes local:
-bash
-minikube start
-Isso criará um cluster Kubernetes em sua máquina local, e o kubectl será configurado automaticamente para interagir com ele.
-
-Passo 3: Configurar o Terraform
-Clone o repositório do projeto para o seu diretório local:
-
-bash
-git clone https://github.com/sebastianascimento/cloud-computing-syllabus.git
-cd TF_PROJECT
-
-
-Agora você pode rodar o Terraform para provisionar os recursos no Kubernetes:
-
-Inicializar o Terraform:
+```bash
 terraform init
+```
 
-Verificar o plano de execução:
-bash
+
+Check execution plan:
+
+```bash
 terraform plan
+```
+Apply configuration:
 
-Aplicar a configuração:
-bash
+```bash
 terraform apply
+```
 
-Após a execução do Terraform, ele irá criar os deployments, services e ingressos no seu cluster Kubernetes, incluindo as configurações para o Odoo e PostgreSQL.
+## Step 4: Configure Ingress for HTTPS Access
 
-Passo 5: Acessar a Aplicação Localmente
-Com o cluster Kubernetes rodando e os recursos provisionados, você pode acessar o Odoo localmente:
+If using Minikube, enable the Ingress addon:
+
+```bash
+minikube addons enable ingress
+```
+
+Now, get the Minikube IP:
+
+```bash
+minikube ip
+```
+
+Add it to your /etc/hosts file:
+
+```bash
+echo "$(minikube ip) odoo.local" | sudo tee -a /etc/hosts
+```
+
+## Step 5: Access the Application Locally
 
 
-Acessar o Odoo no navegador:
-Abra o navegador e acesse o Odoo utilizando o IP retornado pelo comando anterior. O serviço estará disponível no endereço:
-bash
+Now, you can access Odoo locally via HTTPS:
 
-http://localhost:8069
+```bash
+https://odoo.local
+```
 
-Variáveis do Projeto
-As principais variáveis de entrada são:
+If a domain with a valid certificate is configured, use:
 
-client_config: Mapeia as configurações do banco de dados para diferentes clientes (ex: "netflix", "meta", "rockstar").
-clients: Lista de clientes que serão configurados no projeto.
-environment: O ambiente de implantação (ex: "dev", "prod").
-replicas: Número de réplicas para o Deployment do Odoo e PostgreSQL.
+```bash
+https://odoo.yourdomain.com
+```
+
+
 
 
 ## Requirements
